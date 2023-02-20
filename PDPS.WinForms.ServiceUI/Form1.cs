@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration.Install;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PDPS.WinForms.ServiceUI
@@ -19,6 +12,10 @@ namespace PDPS.WinForms.ServiceUI
         public Form1()
         {
             InitializeComponent();
+
+            SetControlBattonsStatus();
+            btn_Install.Enabled = false;
+            btn_Uninstall.Enabled = false;
         }
 
         private void Btn_Browse_Click(object sender, EventArgs e)
@@ -26,6 +23,9 @@ namespace PDPS.WinForms.ServiceUI
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 textBox1.Text = openFileDialog1.SafeFileName;
+                btn_Install.Enabled = true;
+                btn_Uninstall.Enabled = true;
+                SetControlBattonsStatus();
             }
         }
 
@@ -37,18 +37,42 @@ namespace PDPS.WinForms.ServiceUI
             }
             else
             {
+                Cursor = Cursors.WaitCursor;
                 try
                 {
-                    Cursor = Cursors.WaitCursor;
                     ManagedInstallerClass.InstallHelper(new[] { openFileDialog1.FileName });
                     Cursor = Cursors.Default;
 
                     MessageBox.Show("Service \"" + openFileDialog1.FileName + "\" was installed.");
+
+                    bool serviceIsExists = ServiceHelper.TryGetServiceName(openFileDialog1.FileName, out string serviceName);
+                    if (serviceIsExists)
+                    {
+                        _controller = new ServiceController() { ServiceName = serviceName };
+                        SetControlBattonsStatus(_controller);
+                    }
+                    btn_Install.Enabled = false;
+                    btn_Uninstall.Enabled = true;
                 }
                 catch (Exception ex)
                 {
-
-                    throw;
+                    MessageBox.Show(ex.Message);
+                    try
+                    {
+                        bool serviceIsExists = ServiceHelper.TryGetServiceName(openFileDialog1.FileName, out string serviceName);
+                        if (serviceIsExists)
+                        {
+                            _controller = new ServiceController() { ServiceName = serviceName };
+                            SetControlBattonsStatus(_controller);
+                        }
+                        btn_Uninstall.Enabled = true;
+                        btn_Install.Enabled = false;
+                    }
+                    catch (Exception exc) { MessageBox.Show(exc.Message); }
+                }
+                finally
+                {
+                    Cursor = Cursors.Default;
                 }
             }
         }
@@ -61,83 +85,136 @@ namespace PDPS.WinForms.ServiceUI
             }
             else
             {
+                Cursor = Cursors.WaitCursor;
                 try
                 {
-                    Cursor = Cursors.WaitCursor;
                     ManagedInstallerClass.InstallHelper(new[] { @"/u", openFileDialog1.FileName });
-                    Cursor = Cursors.Default;
 
                     MessageBox.Show("Service \"" + openFileDialog1.FileName + "\" was uninstalled.");
+
+                    btn_Uninstall.Enabled = false;
+                    btn_Install.Enabled = true;
+                    SetControlBattonsStatus();
                 }
                 catch (Exception ex)
                 {
-
-                    throw;
+                    MessageBox.Show(ex.Message);
+                }
+                finally
+                {
+                    Cursor = Cursors.Default;
                 }
             }
         }
 
         private void Btn_Start_Click(object sender, EventArgs e)
         {
+            Cursor = Cursors.WaitCursor;
             try
             {
-                Cursor = Cursors.WaitCursor;
-                _controller = new ServiceController() { ServiceName = "PDPService" };
-                _controller.Start();
-                Cursor = Cursors.Default;
+                bool serviceIsExists = ServiceHelper.TryGetServiceName(openFileDialog1.FileName, out string serviceName);
+                if (serviceIsExists)
+                {
+                    _controller = new ServiceController() { ServiceName = serviceName };
+                    _controller.Start();
+                    _controller.WaitForStatus(ServiceControllerStatus.Running);
 
-                MessageBox.Show("Service started.");
+                    SetControlBattonsStatus(_controller);
+
+                    MessageBox.Show("Service started.");
+                }
             }
             catch (Exception ex)
             {
-
-                throw;
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
             }
         }
 
         private void Btn_Stop_Click(object sender, EventArgs e)
         {
+            Cursor = Cursors.WaitCursor;
             try
             {
-                Cursor = Cursors.WaitCursor;
-                _controller = new ServiceController() { ServiceName = "PDPService" };
-                _controller.Stop();
-                Cursor = Cursors.Default;
+                bool serviceIsExists = ServiceHelper.TryGetServiceName(openFileDialog1.FileName, out string serviceName);
+                if (serviceIsExists)
+                {
+                    _controller = new ServiceController() { ServiceName = serviceName };
+                    _controller.Stop();
+                    _controller.WaitForStatus(ServiceControllerStatus.Stopped);
 
-                MessageBox.Show("Service stopped.");
+                    SetControlBattonsStatus(_controller);
+
+                    MessageBox.Show("Service stopped."); 
+                }
             }
             catch (Exception ex)
             {
-
-                throw;
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
             }
         }
 
         private void Btn_Restart_Click(object sender, EventArgs e)
         {
+            Cursor = Cursors.WaitCursor;
             try
             {
-                Cursor = Cursors.WaitCursor;
-
-                _controller = new ServiceController() { ServiceName = "PDPService" };
-                if (_controller.CanStop)
+                bool serviceIsExists = ServiceHelper.TryGetServiceName(openFileDialog1.FileName, out string serviceName);
+                if (serviceIsExists)
                 {
-                    _controller.Stop();
-                }
-                _controller.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(20));
-                if (_controller.Status == ServiceControllerStatus.Stopped)
-                {
-                    _controller.Start();
-                }
+                    _controller = new ServiceController() { ServiceName = serviceName };
+                    if (_controller.CanStop)
+                    {
+                        _controller.Stop();
+                        _controller.WaitForStatus(ServiceControllerStatus.Stopped);
+                        _controller.Start();
+                        _controller.WaitForStatus(ServiceControllerStatus.Running);
+                    }
 
-                Cursor = Cursors.Default;
+                    SetControlBattonsStatus(_controller);
 
-                MessageBox.Show("Service restarted.");
+                    MessageBox.Show("Service restarted."); 
+                }
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+        }
 
-                throw;
+        private void SetControlBattonsStatus(ServiceController controller = null)
+        {
+            if (controller is null)
+            {
+                btn_Stop.Enabled = false;
+                btn_Restart.Enabled = false;
+                btn_Start.Enabled = false;
+            }
+            else
+            {
+                if (controller.Status == ServiceControllerStatus.Stopped)
+                {
+                    btn_Stop.Enabled = false;
+                    btn_Restart.Enabled = false;
+                    btn_Start.Enabled = true;
+                }
+                if (controller.Status == ServiceControllerStatus.Running)
+                {
+                    btn_Start.Enabled = false;
+                    btn_Stop.Enabled = true;
+                    btn_Restart.Enabled = true;
+                }
             }
         }
     }

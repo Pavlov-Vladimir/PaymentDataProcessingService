@@ -135,7 +135,7 @@
             this.Name = "Form1";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Service Manager";
+            this.Text = "Service Manager Lite";
             this.ResumeLayout(false);
             this.PerformLayout();
 

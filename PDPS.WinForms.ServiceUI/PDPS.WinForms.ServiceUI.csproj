@@ -7,7 +7,7 @@
     <ProjectGuid>{18E43393-9B0A-409F-A480-EAD519A5852F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>PDPS.WinForms.ServiceUI</RootNamespace>
-    <AssemblyName>PDPS.WinForms.ServiceUI</AssemblyName>
+    <AssemblyName>ServiceManagerLite</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -56,6 +56,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceHelper.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -80,6 +81,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PDPS.WindowsService\PDPS.WindowsService.csproj">
+      <Project>{5537F4BC-D55F-4C5F-9297-71C744B1F7C3}</Project>
+      <Name>PDPS.WindowsService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
