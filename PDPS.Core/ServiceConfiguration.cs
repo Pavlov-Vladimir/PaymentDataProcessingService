@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace PDPS.Core
 {
-    public class Configuration
+    public class ServiceConfiguration
     {
         private readonly ConfigurationManager _configurationManager = new ConfigurationManager();
         public ConfigurationManager Manager { get; }
         public string InputFolder { get; private set; }
         public string OutputFolder { get; private set; }
 
-        public Configuration() 
+        public ServiceConfiguration() 
         {
             Manager= new ConfigurationManager();
             Manager.AddConfiguration(_configurationManager);

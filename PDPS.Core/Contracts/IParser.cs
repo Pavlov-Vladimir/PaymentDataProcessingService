@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace PDPS.Core.Contracts
 {
-    public interface IParser<T, Tstatus> where T : IEnumerable
+    public interface IParser<Tout, Tstatus> where Tout : IEnumerable where Tstatus : class
     {
         Tstatus Status { get; set; }
 
-        Task<(T, Tstatus)> ParseAsync();
+        Task<(Tout, Tstatus)> ParseAsync();
     }
 }

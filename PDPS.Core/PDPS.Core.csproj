@@ -88,7 +88,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration.cs" />
+    <Compile Include="ParserWorker.cs" />
+    <Compile Include="ServiceConfiguration.cs" />
     <Compile Include="Contracts\IDataConverter.cs" />
     <Compile Include="Contracts\IParser.cs" />
     <Compile Include="Contracts\IParserFactory.cs" />
