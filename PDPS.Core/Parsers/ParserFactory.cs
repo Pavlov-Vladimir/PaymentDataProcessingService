@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace PDPS.Core.Parsers
 {
-    public class ParserFactory : IParserFactory<List<Transaction>>
+    public class ParserFactory : IParserFactory<List<Transaction>, ParserResultStatus>
     {
-        public IParser<List<Transaction>> Create(string path)
+        public IParser<List<Transaction>, ParserResultStatus> Create(string path)
         {
             string extention = path.Split('.').Last().ToLower();
 

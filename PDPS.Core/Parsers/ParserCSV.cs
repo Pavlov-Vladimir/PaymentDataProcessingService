@@ -13,7 +13,7 @@ namespace PDPS.Core.Parsers
         protected override void PreprocessStreamDependsFromParserType(StreamReader reader)
         {
             reader.ReadLine();
-            ParsedLines++;
+            Status.ParsedLines++;
         }
     }
 }

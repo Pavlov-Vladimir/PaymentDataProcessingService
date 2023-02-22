@@ -2,8 +2,8 @@
 
 namespace PDPS.Core.Contracts
 {
-    public interface IParserFactory<T> where T : IEnumerable
+    public interface IParserFactory<T, Tstatus> where T : IEnumerable
     {
-        IParser<T> Create(string path);
+        IParser<T, Tstatus> Create(string path);
     }
 }

@@ -9,29 +9,27 @@ using System.Threading.Tasks;
 
 namespace PDPS.Core.Parsers
 {
-    public abstract class ParserBase : IParser<List<Transaction>>
+    public abstract class ParserBase : IParser<List<Transaction>, ParserResultStatus>
     {
-        public int Errors { get; set; }
-        public int ParsedLines { get; set; }
-        public string Path { get; set; }
+        public ParserResultStatus Status { get; set; }
 
         public ParserBase() { }
 
         public ParserBase(string path)
         {
-            Path = path;
+            Status.FilePath = path;
         }
 
-        public virtual async Task<List<Transaction>> ParseAsync()
+        public virtual async Task<(List<Transaction>, ParserResultStatus)> ParseAsync()
         {
-            Errors = 0;
-            ParsedLines = 0;
+            Status.Errors = 0;
+            Status.ParsedLines = 0;
 
             List<Transaction> transactions = new List<Transaction>();
             string line;
             string[] data;
 
-            using (StreamReader reader = new StreamReader(Path))
+            using (StreamReader reader = new StreamReader(Status.FilePath))
             {
                 PreprocessStreamDependsFromParserType(reader);
 
@@ -40,36 +38,36 @@ namespace PDPS.Core.Parsers
                     line = await reader.ReadLineAsync();
                     if (line.Where(c => c == '"').Count() != 2)
                     {
-                        Errors++;
+                        Status.Errors++;
                         continue;
                     }
 
                     data = line.Replace("\"", "").Split(new char[] { ',' });
                     if (data.Length != 9)
                     {
-                        Errors++;
+                        Status.Errors++;
                         continue;
                     }
 
                     bool isValidTransaction = TryCreateTransaction(data, out Transaction transaction);
                     if (!isValidTransaction)
                     {
-                        Errors++;
+                        Status.Errors++;
                     }
-                    else if (Errors == 0)
+                    else if (Status.Errors == 0)
                     {
                         transactions.Add(transaction);
                     }
-                    ParsedLines++;
+                    Status.ParsedLines++;
                 }
             }
 
-            if (Errors != 0)
+            if (Status.Errors != 0)
             {
                 transactions = new List<Transaction>();
             }
 
-            return transactions;
+            return (transactions, Status);
         }
 
         protected virtual void PreprocessStreamDependsFromParserType(StreamReader reader)
