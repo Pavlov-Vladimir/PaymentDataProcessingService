@@ -88,6 +88,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IWriter.cs" />
     <Compile Include="ParserWorker.cs" />
     <Compile Include="ServiceConfiguration.cs" />
     <Compile Include="Contracts\IDataConverter.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Parsers\ParserCSV.cs" />
     <Compile Include="Parsers\ParserTXT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Writers\ReportWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

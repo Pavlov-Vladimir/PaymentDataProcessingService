@@ -1,12 +1,8 @@
 ﻿using PDPS.Core.Contracts;
 using PDPS.Core.DTOs;
-using PDPS.Core.Parsers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PDPS.Core
 {
