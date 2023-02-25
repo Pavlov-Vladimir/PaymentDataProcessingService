@@ -1,7 +1,6 @@
 ﻿using PDPS.Core.Contracts;
 using PDPS.Core.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -10,44 +9,40 @@ using System.Threading.Tasks;
 
 namespace PDPS.Core.Writers
 {
-    public class ReportWriter : IWriter<Report>
+    public class MetaWriter : IWriter<MetaReport>
     {
         private readonly string _basePath;
-        public bool IsActive { get; private set; }
 
         public string DirectoryPath => $"{_basePath}\\{DateTime.Now:MM-dd-yyyy}";
 
-        public ReportWriter(string path)
+        public MetaWriter(string path)
         {
             _basePath = path;
         }
 
-        public async Task Write(string file, Report report)
+        public async Task Write(string file, MetaReport meta)
         {
             try
             {
-                IsActive = true;
                 if (!Directory.Exists(DirectoryPath))
                 {
                     Directory.CreateDirectory(DirectoryPath);
                 }
-                string fullPath = Path.Combine(DirectoryPath, file);                
+                string fullPath = Path.Combine(DirectoryPath, file);
                 JsonSerializerOptions options = new JsonSerializerOptions()
                 {
                     WriteIndented = true,
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
                 };
                 using FileStream fs = new FileStream(fullPath, FileMode.CreateNew, FileAccess.Write);
-                await JsonSerializer.SerializeAsync<List<City>>(fs, report.Cities, options);
+                await JsonSerializer.SerializeAsync<MetaReport>(fs, meta, options);
             }
             catch (Exception)
             {
                 throw;
             }
-            finally 
-            {
-                IsActive = false; 
-            }
         }
+
+
     }
 }

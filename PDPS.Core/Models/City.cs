@@ -35,7 +35,7 @@ namespace PDPS.Core.Models
             }
         }
 
-        public City(string name, Service service)
+        public City(string name, Service service) : this(name)
         {
             if (service != null)
             {

@@ -1,12 +1,12 @@
 ﻿using PDPS.Core.Contracts;
 using PDPS.Core.DTOs;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PDPS.Core
 {
-    public class ParserWorker<T, S> where T : IEnumerable where S : ParserResultStatus
+    public class ParserWorker<T, S> where T : class where S : ParserResultStatus
     {
         private readonly IParserFactory<T, S> _parserFactory;
 
@@ -21,6 +21,7 @@ namespace PDPS.Core
         public ParserWorker(IParserFactory<T, S> factory)
         {
             _parserFactory = factory;
+            InvalidFiles = new List<string>();
         }
 
         public void Start(string path)
@@ -34,20 +35,36 @@ namespace PDPS.Core
             IsActive = false;
         }
 
+        public void Reset()
+        {
+            IsActive = false;
+            ErrorLines = 0;
+            ParsedLines = 0;
+            ParsedFiles = 0;
+            InvalidFiles = new List<string>();
+        }
+
         private async void Work(string path)
         {
             var parser = _parserFactory.Create(path);
-
-            var (transactions, status) = await parser.ParseAsync();
-            ParsedLines += status.ParsedLines;
-            ParsedFiles++;
-            if (status.Errors != 0)
+            var fileName = path.Split('\\').Last();
+            if (parser == null)
             {
-                ErrorLines += status.Errors;
-                InvalidFiles.Add(path);
+                InvalidFiles.Add(fileName);
+                OnCompleted?.Invoke(this, null);
             }
-
-            OnCompleted?.Invoke(this, transactions);
+            else
+            {
+                var (transactions, status) = await parser.ParseAsync();
+                ParsedLines += status.ParsedLines;
+                if (status.Errors != 0)
+                {
+                    ErrorLines += status.Errors;
+                    InvalidFiles.Add(fileName);
+                }
+                OnCompleted?.Invoke(this, transactions);
+            }
+            ParsedFiles++;
             IsActive = false;
         }
     }

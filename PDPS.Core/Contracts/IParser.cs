@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 
 namespace PDPS.Core.Contracts
 {
-    public interface IParser<Tout, Tstatus> where Tout : IEnumerable where Tstatus : class
+    public interface IParser<Tout, Tstatus>
+        where Tout : class
+        where Tstatus : class
     {
         Tstatus Status { get; set; }
 

@@ -8,12 +8,15 @@ namespace PDPS.Core.Models
     [Serializable]
     public class Report
     {
-        [JsonPropertyName(null)]
+        [JsonPropertyName("report")]
         public List<City> Cities { get; private set; }
 
-        public Report() { }
+        public Report()
+        {
+            Cities = new List<City>();
+        }
 
-        public Report(List<City> cities)
+        public Report(List<City> cities) : this()
         {
             Cities = cities;
         }

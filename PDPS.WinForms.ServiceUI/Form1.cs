@@ -23,9 +23,33 @@ namespace PDPS.WinForms.ServiceUI
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 textBox1.Text = openFileDialog1.SafeFileName;
+                Cursor = Cursors.WaitCursor;
                 btn_Install.Enabled = true;
                 btn_Uninstall.Enabled = true;
                 SetControlBattonsStatus();
+                Cursor = Cursors.Default;
+                //try
+                //{
+                //    bool serviceIsExists = ServiceHelper.TryGetServiceName(openFileDialog1.FileName, out string serviceName);
+                //    if (serviceIsExists)
+                //    {
+                //        _controller = new ServiceController() { ServiceName = serviceName };
+                //        btn_Install.Enabled = false;
+                //        btn_Uninstall.Enabled = true;
+                //        SetControlBattonsStatus(_controller);
+                //    }
+                //    else
+                //    {
+                //        btn_Install.Enabled = true;
+                //        btn_Uninstall.Enabled = false;
+                //        SetControlBattonsStatus();
+                //    }
+                //}
+                //catch (Exception ex)
+                //{
+                //    MessageBox.Show(ex.Message);
+                //}
+                //finally { Cursor = Cursors.Default; }
             }
         }
 
@@ -148,7 +172,7 @@ namespace PDPS.WinForms.ServiceUI
 
                     SetControlBattonsStatus(_controller);
 
-                    MessageBox.Show("Service stopped."); 
+                    MessageBox.Show("Service stopped.");
                 }
             }
             catch (Exception ex)
@@ -180,7 +204,7 @@ namespace PDPS.WinForms.ServiceUI
 
                     SetControlBattonsStatus(_controller);
 
-                    MessageBox.Show("Service restarted."); 
+                    MessageBox.Show("Service restarted.");
                 }
             }
             catch (Exception ex)

@@ -17,8 +17,8 @@ namespace PDPS.Core
 
         public void SetConfiguration()
         {
-            InputFolder = Manager.GetSection("InitialConnection").Value;
-            OutputFolder = Manager.GetSection("DefaultConnection").Value;
+            InputFolder = Manager.GetSection("InputFolder").Value;
+            OutputFolder = Manager.GetSection("OutputFolder").Value;
         }
     }
 }

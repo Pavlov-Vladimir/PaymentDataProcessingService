@@ -14,12 +14,16 @@ namespace PaymentDataProcessingService.WindowsService
         /// </summary>
         static void Main()
         {
+#if !DEBUG
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
                 new PDPService()
             };
-            ServiceBase.Run(ServicesToRun);
+            ServiceBase.Run(ServicesToRun); 
+#else
+            new PDPService().ConsoleRun();
+#endif
         }
     }
 }
