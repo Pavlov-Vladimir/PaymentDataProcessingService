@@ -28,28 +28,6 @@ namespace PDPS.WinForms.ServiceUI
                 btn_Uninstall.Enabled = true;
                 SetControlBattonsStatus();
                 Cursor = Cursors.Default;
-                //try
-                //{
-                //    bool serviceIsExists = ServiceHelper.TryGetServiceName(openFileDialog1.FileName, out string serviceName);
-                //    if (serviceIsExists)
-                //    {
-                //        _controller = new ServiceController() { ServiceName = serviceName };
-                //        btn_Install.Enabled = false;
-                //        btn_Uninstall.Enabled = true;
-                //        SetControlBattonsStatus(_controller);
-                //    }
-                //    else
-                //    {
-                //        btn_Install.Enabled = true;
-                //        btn_Uninstall.Enabled = false;
-                //        SetControlBattonsStatus();
-                //    }
-                //}
-                //catch (Exception ex)
-                //{
-                //    MessageBox.Show(ex.Message);
-                //}
-                //finally { Cursor = Cursors.Default; }
             }
         }
 
@@ -198,9 +176,9 @@ namespace PDPS.WinForms.ServiceUI
                     {
                         _controller.Stop();
                         _controller.WaitForStatus(ServiceControllerStatus.Stopped);
-                        _controller.Start();
-                        _controller.WaitForStatus(ServiceControllerStatus.Running);
                     }
+                    _controller.Start();
+                    _controller.WaitForStatus(ServiceControllerStatus.Running);
 
                     SetControlBattonsStatus(_controller);
 

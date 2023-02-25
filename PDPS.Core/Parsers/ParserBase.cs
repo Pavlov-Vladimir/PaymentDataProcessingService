@@ -3,6 +3,7 @@ using PDPS.Core.DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -13,10 +14,14 @@ namespace PDPS.Core.Parsers
     public abstract class ParserBase : IParser<List<Transaction>, ParserResultStatus>
     {
         public ParserResultStatus Status { get; set; }
+        public List<string> FileContent { get; set; }
 
-        public ParserBase() { }
+        public ParserBase() 
+        {
+            FileContent = new List<string>();
+        }
 
-        public ParserBase(string path)
+        public ParserBase(string path) : this()
         {
             Status = new ParserResultStatus()
             {
@@ -24,23 +29,26 @@ namespace PDPS.Core.Parsers
             };
         }
 
+        public async Task ReadFileAsync()
+        {
+            FileContent = await Task.Run(async () =>
+            {
+                await Task.Delay(1);                    // because FileSystemWatcher some times hasn't released the file yet 
+                return File.ReadLines(Status.FilePath).ToList();
+            });
+        }
+
         public virtual async Task<(List<Transaction>, ParserResultStatus)> ParseAsync()
         {
+            PrepareContentDependsByParserType();
+
             Status.Errors = 0;
             Status.ParsedLines = 0;
 
             List<Transaction> transactions = new List<Transaction>();
             string[] data;
 
-            var fileContent = await Task.Run(async () =>
-            {
-                await Task.Delay(1);   // because FileSystemWatcher some times hasn't released the file yet 
-                return File.ReadAllLines(Status.FilePath);
-            });
-
-            ProcessContentDependsByParserType(fileContent);
-
-            foreach (string line in fileContent)
+            foreach (string line in FileContent)
             {
                 if (line.Where(c => c == '"').Count() != 2)
                 {
@@ -76,19 +84,12 @@ namespace PDPS.Core.Parsers
             return (transactions, Status);
         }
 
-        protected virtual void ProcessContentDependsByParserType(string[] fileContent)
-        {
-
-        }
-
-        protected virtual void PreprocessStreamDependsFromParserType(StreamReader reader)
-        {
-
-        }
+        protected virtual void PrepareContentDependsByParserType()
+        {  }
 
         private bool TryCreateTransaction(string[] data, out Transaction transaction)
         {
-            bool isDecimal = decimal.TryParse(data[5], out decimal payment);
+            bool isDecimal = decimal.TryParse(data[5], NumberStyles.Any, CultureInfo.InvariantCulture, out decimal payment);
             bool isDate = DateTime.TryParseExact(data[6], "yyyy-dd-MM", null, DateTimeStyles.None, out DateTime date);
             bool isLong = long.TryParse(data[7], out long account_number);
             bool isValidFields = isDecimal && isDate && isLong;
@@ -108,6 +109,7 @@ namespace PDPS.Core.Parsers
                 Payment = payment,
                 AccountNumber = account_number
             };
+
             var context = new ValidationContext(transaction);
             var results = new List<ValidationResult>();
 

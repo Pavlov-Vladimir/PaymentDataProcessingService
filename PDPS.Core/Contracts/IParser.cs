@@ -9,6 +9,7 @@ namespace PDPS.Core.Contracts
     {
         Tstatus Status { get; set; }
 
+        Task ReadFileAsync();
         Task<(Tout, Tstatus)> ParseAsync();
     }
 }

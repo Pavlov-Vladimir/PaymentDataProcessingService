@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace PDPS.Core.Parsers
+﻿namespace PDPS.Core.Parsers
 {
     public class ParserCSV : ParserBase
     {
@@ -10,9 +8,9 @@ namespace PDPS.Core.Parsers
         {
         }
 
-        protected override void PreprocessStreamDependsFromParserType(StreamReader reader)
+        protected override void PrepareContentDependsByParserType()
         {
-            reader.ReadLine();
+            FileContent.RemoveAt(0);
             Status.ParsedLines++;
         }
     }

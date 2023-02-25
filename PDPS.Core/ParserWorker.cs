@@ -55,6 +55,7 @@ namespace PDPS.Core
             }
             else
             {
+                await parser.ReadFileAsync();
                 var (transactions, status) = await parser.ParseAsync();
                 ParsedLines += status.ParsedLines;
                 if (status.Errors != 0)
