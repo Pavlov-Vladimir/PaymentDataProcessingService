@@ -26,8 +26,16 @@ namespace PDPS.Core
 
         public void Start(string path)
         {
-            IsActive = true;
-            Work(path);
+            try
+            {
+                IsActive = true;
+                Work(path);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally { IsActive = false; }
         }
 
         public void Stop()

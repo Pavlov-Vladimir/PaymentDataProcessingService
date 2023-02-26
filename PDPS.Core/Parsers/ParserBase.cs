@@ -33,7 +33,7 @@ namespace PDPS.Core.Parsers
         {
             FileContent = await Task.Run(async () =>
             {
-                await Task.Delay(1);                    // because FileSystemWatcher some times hasn't released the file yet 
+                await Task.Delay(1);              // because FileSystemWatcher some times hasn't released the file yet 
                 return File.ReadLines(Status.FilePath).ToList();
             });
         }
@@ -46,42 +46,58 @@ namespace PDPS.Core.Parsers
             Status.ParsedLines = 0;
 
             List<Transaction> transactions = new List<Transaction>();
-            string[] data;
 
-            foreach (string line in FileContent)
+            await Task.Run(async () =>
             {
-                if (line.Where(c => c == '"').Count() != 2)
-                {
-                    Status.Errors++;
-                    continue;
-                }
-
-                data = line.Replace("\"", "").Split(new char[] { ',' });
-                if (data.Length != 9)
-                {
-                    Status.Errors++;
-                    continue;
-                }
-                var transactionData = data.Select(x => x.Trim()).ToArray();
-
-                bool isValidTransaction = TryCreateTransaction(transactionData, out Transaction transaction);
-                if (!isValidTransaction)
-                {
-                    Status.Errors++;
-                }
-                else if (Status.Errors == 0)
-                {
-                    transactions.Add(transaction);
-                }
-                Status.ParsedLines++;
-            }
-
-            if (Status.Errors != 0)
-            {
-                transactions = new List<Transaction>();
-            }
+                transactions = await ConvertContentToTransactionsAsync(transactions);
+            });
 
             return (transactions, Status);
+        }
+
+        private Task<List<Transaction>> ConvertContentToTransactionsAsync(List<Transaction> transactions)
+        {
+            try
+            {
+                string[] data;
+                foreach (string line in FileContent)
+                {
+                    if (line.Where(c => c == '"').Count() != 2)
+                    {
+                        Status.Errors++;
+                        continue;
+                    }
+
+                    data = line.Replace("\"", "").Split(new char[] { ',' });
+                    if (data.Length != 9)
+                    {
+                        Status.Errors++;
+                        continue;
+                    }
+                    var transactionData = data.Select(x => x.Trim()).ToArray();
+
+                    bool isValidTransaction = TryCreateTransaction(transactionData, out Transaction transaction);
+                    if (!isValidTransaction)
+                    {
+                        Status.Errors++;
+                    }
+                    else if (Status.Errors == 0)
+                    {
+                        transactions.Add(transaction);
+                    }
+                    Status.ParsedLines++;
+                }
+                if (Status.Errors != 0)
+                {
+                    transactions = new List<Transaction>();
+                }
+
+                return Task.FromResult(transactions);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         protected virtual void PrepareContentDependsByParserType()

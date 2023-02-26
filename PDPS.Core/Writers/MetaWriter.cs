@@ -11,13 +11,14 @@ namespace PDPS.Core.Writers
 {
     public class MetaWriter : IWriter<MetaReport>
     {
-        private readonly string _basePath;
+        public string BasePath;
+        public string DirectoryPath => $"{BasePath}\\{DateTime.Now:MM-dd-yyyy}";
 
-        public string DirectoryPath => $"{_basePath}\\{DateTime.Now:MM-dd-yyyy}";
+        public MetaWriter() {  }
 
         public MetaWriter(string path)
         {
-            _basePath = path;
+            BasePath = path;
         }
 
         public async Task Write(string file, MetaReport meta)

@@ -12,14 +12,15 @@ namespace PDPS.Core.Writers
 {
     public class ReportWriter : IWriter<Report>
     {
-        private readonly string _basePath;
         public bool IsActive { get; private set; }
+        public string BasePath { get; set; }
+        public string DirectoryPath => $"{BasePath}\\{DateTime.Now:MM-dd-yyyy}";
 
-        public string DirectoryPath => $"{_basePath}\\{DateTime.Now:MM-dd-yyyy}";
+        public ReportWriter() { }
 
         public ReportWriter(string path)
         {
-            _basePath = path;
+            BasePath = path;
         }
 
         public async Task Write(string file, Report report)
