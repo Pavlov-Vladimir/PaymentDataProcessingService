@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
 
 namespace PaymentDataProcessingService.WindowsService
 {
@@ -14,12 +9,16 @@ namespace PaymentDataProcessingService.WindowsService
         /// </summary>
         static void Main()
         {
+#if DEBUG
+            new PDPService().ConsoleRun();
+#else
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
                 new PDPService()
             };
-            ServiceBase.Run(ServicesToRun);
+            ServiceBase.Run(ServicesToRun); 
+#endif
         }
     }
 }
